@@ -1,7 +1,9 @@
 from flask import Flask
 from flask import make_response
+from flask import redirect
 from flask import request
 from flask import render_template
+from flask import url_for
 from markupsafe import escape
 
 app = Flask(__name__)
@@ -12,7 +14,7 @@ def index():
     if username:
         return render_template('home.html', username=username)
     else:
-        return login()
+        return redirect(url_for('login'))
 
 @app.route("/hello/")
 @app.route("/hello/<name>")
