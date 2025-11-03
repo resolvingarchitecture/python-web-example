@@ -8,6 +8,10 @@ from markupsafe import escape
 
 app = Flask(__name__)
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('errors/404.html'), 404
+
 @app.route("/")
 def index():
     username = request.cookies.get('username')
