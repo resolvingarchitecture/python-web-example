@@ -1,11 +1,13 @@
-from flask import Flask, request, render_template
+from flask import Flask
+from flask import request
+from flask import render_template
 from markupsafe import escape
 
 app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello World!!</p>"
+    return login()
 
 @app.route("/hello/")
 @app.route("/hello/<name>")
@@ -43,6 +45,19 @@ def about():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        return 'POST Login Credentials'
+        if valid_login(request.form['username'],
+                       request.form['password']):
+            return log_the_user_in(request.form['username'])
+        else:
+            return render_template('login.html', error='Invalid username/password')
     else:
-        return 'GET Login Page'
+        return render_template('login.html', error=None)
+
+def valid_login(username, password):
+    return username=='User' and password=='123'
+
+def log_the_user_in(username):
+    return render_template('home.html', username=username)
+
+if __name__ == '__main__':
+    app.run(debug=True, use_debugger=False, use_reloader=False, passthrough_errors=True)
