@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from markupsafe import escape
 
 app = Flask(__name__)
@@ -6,6 +6,11 @@ app = Flask(__name__)
 @app.route("/")
 def hello_world():
     return "<p>Hello World!!</p>"
+
+@app.route("/hello/")
+@app.route("/hello/<name>")
+def hello(name=None):
+    return render_template('hello.html', person=name)
 
 @app.route("/escaped")
 def escaped():
