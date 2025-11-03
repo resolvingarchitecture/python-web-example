@@ -1,0 +1,12 @@
+<!doctype html>
+<title>Login</title>
+{% if error %}
+<textarea>
+    {{ error }}
+</textarea>
+{% endif %}
+<form method="post" action="login">
+    <input name="username"/>
+    <input name="password"/>
+    <button type="submit">Login</button>
+</form>
