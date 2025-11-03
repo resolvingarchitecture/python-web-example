@@ -10,3 +10,4 @@ A Python project to try out a common light web stack:
 + Celery - task queuing
 + Pydantic - data validation
 + PostgreSQL - relational database
++ PGAdmin4 - PostgreSQL client
