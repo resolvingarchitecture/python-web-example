@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import make_response
 from flask import request
 from flask import render_template
 from markupsafe import escape
@@ -6,8 +7,12 @@ from markupsafe import escape
 app = Flask(__name__)
 
 @app.route("/")
-def hello_world():
-    return login()
+def index():
+    username = request.cookies.get('username')
+    if username:
+        return render_template('home.html', username=username)
+    else:
+        return login()
 
 @app.route("/hello/")
 @app.route("/hello/<name>")
@@ -57,7 +62,15 @@ def valid_login(username, password):
     return username=='User' and password=='123'
 
 def log_the_user_in(username):
-    return render_template('home.html', username=username)
+     resp = make_response(render_template('home.html', username=username))
+     resp.set_cookie('username', username)
+     return resp
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    resp = make_response(render_template('login.html'))
+    resp.delete_cookie('username')
+    return resp
 
 if __name__ == '__main__':
     app.run(debug=True, use_debugger=False, use_reloader=False, passthrough_errors=True)
