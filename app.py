@@ -1,3 +1,6 @@
+import dataclasses
+import logging
+
 from flask import Flask
 from flask import jsonify
 from flask import make_response
@@ -8,14 +11,77 @@ from flask import session
 from flask import url_for
 from markupsafe import escape
 from flask_sqlalchemy import SQLAlchemy
-
-class Config:
-    TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///webex.sqlite3.db'
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import create_engine
+from dataclasses import dataclass
 
 app = Flask(__name__)
-app.config.from_object(Config())
-db = SQLAlchemy(app)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+ch.setFormatter(formatter)
+
+log.addHandler(ch)
+
+log.info("App starting...")
+
+class Base(DeclarativeBase):
+  pass
+
+db = SQLAlchemy(model_class=Base)
+
+@dataclass
+class User(db.Model):
+
+    __tablename__ = "users"
+
+    _id: Mapped[int] = db.Column(db.Integer, primary_key=True)
+    _username: Mapped[str] = db.Column(db.String(32), unique=True, nullable=False)
+    _password: Mapped[str] = db.Column(db.String(16), nullable=False)
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, v: str):
+        self._username = v
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, v: str):
+        self._password = v
+
+db.init_app(app)
+with app.app_context():
+    db.create_all()
+
+with app.app_context():
+    user = User()
+    user.username = "User"
+    user.password = "123"
+    db.session.add(user)
+    db.session.commit()
+    admin = User()
+    admin.username = "Admin"
+    admin.password = "123"
+    db.session.add(admin)
+    db.session.commit()
 # migrate = Migrate(app, db)
 
 # Set the secret key to some random bytes. Keep this really secret. TODO: load it from the environment
@@ -48,7 +114,10 @@ def login():
         return render_template('login.html', error=None)
 
 def valid_login(username, password):
-    return (username=='User' and password=='123') or (username=='Admin' and password=='123')
+    log.info("Username="+username)
+    log.info("Password="+password)
+    user = User.query.filter_by(_username=username).first()
+    return user is not None and user.password == password
 
 def log_the_user_in(username):
      session["username"] = username
@@ -94,11 +163,7 @@ def about():
 # APIs
 @app.route('/api/users', methods=['GET'])
 def api_users():
-    users = get_all_users()
-    return jsonify(users)
-
-def get_all_users():
-    return ['User','Admin']
+    return jsonify(User.query.all())
 
 if __name__ == '__main__':
     app.run(debug=True, use_debugger=False, use_reloader=False, passthrough_errors=True)
