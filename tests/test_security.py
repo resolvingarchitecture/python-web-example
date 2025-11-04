@@ -1,7 +1,5 @@
-import pytest
 
-def fun(x):
-    return x+1
-
-def test_answer():
-    assert fun(3) == 4
+def test_login(client):
+    data = {"username":"User","password":"123"}
+    response = client.post("/login", data=data)
+    assert response.status == '302 FOUND'

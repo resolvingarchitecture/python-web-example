@@ -7,8 +7,16 @@ from flask import render_template
 from flask import session
 from flask import url_for
 from markupsafe import escape
+from flask_sqlalchemy import SQLAlchemy
+
+class Config:
+    TESTING = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///webex.sqlite3.db'
 
 app = Flask(__name__)
+app.config.from_object(Config())
+db = SQLAlchemy(app)
+# migrate = Migrate(app, db)
 
 # Set the secret key to some random bytes. Keep this really secret. TODO: load it from the environment
 app.secret_key = b'_f9j38hfnu746bnakdk'
