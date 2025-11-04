@@ -9,10 +9,10 @@ jobs:
       max-parallel: 5
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.14-nogil]
+        python-version: [3.14.0]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.14 No GIL
+      - name: Set up Python 3.14.0
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
