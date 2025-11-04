@@ -1,11 +1,11 @@
 import pytest
+from app import app
 # import sqlalchemy
 
-from app import app
-
-@pytest.fixture()
-def test_app():
-    return app()
+@pytest.fixture(scope="session")
+def app():
+    app.config.from_object("config.TestingConfig")
+    return app
 
 @pytest.fixture()
 def client(test_app):
