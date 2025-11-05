@@ -18,8 +18,9 @@ from sqlalchemy import create_engine
 from dataclasses import dataclass
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -71,17 +72,17 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-with app.app_context():
-    user = User()
-    user.username = "User"
-    user.password = "123"
-    db.session.add(user)
-    db.session.commit()
-    admin = User()
-    admin.username = "Admin"
-    admin.password = "123"
-    db.session.add(admin)
-    db.session.commit()
+# with app.app_context():
+#     user = User()
+#     user.username = "User"
+#     user.password = "123"
+#     db.session.add(user)
+#     db.session.commit()
+#     admin = User()
+#     admin.username = "Admin"
+#     admin.password = "123"
+#     db.session.add(admin)
+#     db.session.commit()
 # migrate = Migrate(app, db)
 
 # Set the secret key to some random bytes. Keep this really secret. TODO: load it from the environment
